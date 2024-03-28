@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
-            padding-top: 56px; /* Adjust according to navbar height */
+            padding-top: 100px; /* Adjust according to navbar height */
             padding-bottom: 70px; /* Adjust according to footer height */
             overflow-y: scroll; /* Add scrollbar when content exceeds viewport height */
         }
@@ -26,6 +26,20 @@
         body.navbar-open {
             padding-top: 200px; /* Adjust according to navbar height and expanded navbar height */
         }
+
+        .home-icon {
+            margin-right: 10px; /* Adjust margin as needed */
+        }
+
+        .home-icon a {
+            color: #ffffff; /* Adjust icon color as needed */
+            text-decoration: none;
+        }
+
+        .feather {
+            width: 24px; /* Adjust icon size as needed */
+            height: 24px; /* Adjust icon size as needed */
+        }
     </style>
 </head>
 <body>   
@@ -33,27 +47,33 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
+            <a class="home-icon" href="{% url 'manage_students' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
+                    <path d="M3 9l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
             <a class="navbar-brand" href="#">Update Students</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
+                <ul class="navbar-nav ">
                     <li class="nav-item">
                         <a class="nav-link" href="#">Profile</a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="#">Settings</a>
-                    </li>
+                    </li> -->
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Logout</a>
+                        <a class="nav-link" href="#" style="color: rgb(255, 113, 113); font-weight: bold;">Logout</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-5 mb-5">
+    <div class="container mt-20 mb-5">
         <!-- Search Bar -->
         <form class="mt-5 mb-4">
             <div class="form-group">

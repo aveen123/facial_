@@ -1,14 +1,19 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth import get_user_model  # Import the get_user_model function
 
 from attendance_system import settings
-from .models import Admin, Student
+from .models import Admin, Student, Teacher
 from .forms import AdminForm, StudentForm
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 import face_recognition
 import os
+
+
 
 import cv2
 import numpy as np
@@ -20,8 +25,6 @@ import numpy as np
 def index(request):
     return render(request, 'index.html')
 
-def login(request):
-    return render(request, 'login.html')
 
 def about(request):
     return render(request, 'about.html')
@@ -41,6 +44,7 @@ def manage_students(request):
 
 # MANAGE ADMIN
 def manage_admin(request):
+
     # Add your logic here to manage students
     return render(request, 'manage_admin.html')
 
@@ -152,7 +156,19 @@ def edit_admin(request, admin_id):
 def delete_student(request, student_id):
     student = get_object_or_404(Student, pk=student_id)
     if request.method == 'POST':
+        # Construct the image filename
+        image_filename = f"{student_id}.jpg"
+        image_path = os.path.join(settings.MEDIA_ROOT, "Student_Images", image_filename)
+        
+        # Delete the image file if it exists
+        try:
+            os.remove(image_path)
+        except FileNotFoundError:
+            pass  # Image file not found
+        
+        # Delete the student from the database
         student.delete()
+        
         return redirect('update_students')
     else:
         return HttpResponseBadRequest("Invalid request method")
@@ -169,18 +185,6 @@ def delete_admin(request, admin_id):
 
 # STUDENT LOGIN ------------------
 
-def student_login(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('student_home')
-        else:
-            return render(request, 'student_login.html', {'error_message': 'Invalid username or password'})
-    return render(request, 'student_login.html')
-
 # TEACHER HOME
 def teacher_home(request):
     # Handle admin dashboard logic here
@@ -188,39 +192,48 @@ def teacher_home(request):
 
 # TEACHER LOGIN -----------------
 
-def teacher_login(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('teacher_home')
-        else:
-            return render(request, 'teacher_login.html', {'error_message': 'Invalid username or password'})
-    return render(request, 'teacher_login.html')
-
-
 # ADMIN HOME ----------------------
 
+# @login_required  # Add this decorator to restrict access to authenticated users only
 def admin_home(request):
-    # Handle admin dashboard logic here
-    return render(request, 'admin_home.html')
+    print("This is admin home")
 
-# ADMIN LOGIN ---------------------
+    username = request.user.username  # Get the username of the logged-in user
+    print(username)
+    # Pass the username to the template
+    return render(request, 'admin_home.html', {'username': username})
 
-def admin_login(request):
+
+def login(request):
     if request.method == 'POST':
+        # If the request method is POST, it means the form has been submitted
         username = request.POST.get('username')
         password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('admin_home')
+        # print("Received username:", username)
+        # print("Received password:", password)
+
+        # Retrieve the Admin object based on the provided username
+        try:
+            admin = Admin.objects.get(username=username)
+            # print("Admin found in the database:", admin)
+            # print(admin.username, admin.password)
+        except Admin.DoesNotExist:
+            print("No admin found")
+            admin = None
+
+        admin = Admin.objects.filter(username=username).first()  # Retrieve the Admin object
+        if admin and admin.username == username and admin.password == password:
+            # Authentication successful, log in the user
+            user = authenticate(request, username= admin.username, password=admin.password)
+            print(user)
+            if user is not None:
+                auth_login(request, user)
+            return redirect('admin_home')  # Redirect to admin_home page
         else:
-            return render(request, 'admin_login.html', {'error_message': 'Invalid username or password'})
-    return render(request, 'admin_login.html')
+            # Invalid username or password, render login page with alert
+            messages.error(request, 'Invalid username or password.')
+            return render(request, 'login.html', {'username': username})
 
-
-# IMAGE TRAINING AND RECOGNITION ---------
+    else:
+        return render(request, 'login.html')
 

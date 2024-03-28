@@ -38,17 +38,18 @@
             text-align: center;
         }
         body {
-            background-color: #f8f9fa;
+            background-color: #e2eaf1;
         }
         .login-container {
             margin-top: 250px;
+            
         }
         .card-login {
             max-width: 400px;
             margin: auto;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0px 0px 20px 0px rgba(0,0,0,0.1);
+            box-shadow: 0px 0px 30px 10px rgba(0,0,0,0.1);
         }
         .card-login h3 {
             text-align: center;
@@ -68,6 +69,20 @@
             text-align: center;
             margin-top: 20px;
         }
+
+        .home-icon {
+            margin-right: 10px; /* Adjust margin as needed */
+        }
+
+        .home-icon a {
+            color: #ffffff; /* Adjust icon color as needed */
+            text-decoration: none;
+        }
+
+        .feather {
+            width: 24px; /* Adjust icon size as needed */
+            height: 24px; /* Adjust icon size as needed */
+        }
     </style>
 
     
@@ -77,6 +92,12 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
+            <a class="home-icon" href="{% url 'index' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
+                    <path d="M3 9l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+            </a>
             <a class="navbar-brand" href="{% url 'index' %}">Attendance System</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -101,30 +122,41 @@
     <div class="login-container">
         <div class="card card-login">
             <h3>Login</h3>
-            <form>
-                <div class="form-group">
-                    <label for="username">Email or Username</label>
-                    <input type="text" class="form-control" id="username" placeholder="Enter email or username">
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Enter password">
-                </div>
-                <button type="submit" class="btn btn-primary btn-login">Login</button>
+            
+            {% if error_message %}
+            <div class="alert alert-danger">
+                {{ error_message }}
+            </div>
+            {% endif %}
+            
+            <form method="post" action="{% url 'login' %}">
+                <input type="text" name="username" placeholder="Username" value="{{ username }}">
+                <input type="password" name="password" placeholder="Password">
+                {% csrf_token %}
+                <button type="submit">Login</button>
             </form>
+            
             <div class="forgot-password">
                 <a href="#">Forgot password?</a>
             </div>
             <div class="create-account">
-                Don't have an account? <a href="#">Contact Adminstration</a>
+                Don't have an account? <a href="{% url 'contact' %}">Contact Administration</a>
             </div>
         </div>
     </div>
+    
+    
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <!-- <script>
+        // Function to show alert and redirect
+        function showAlert() {
+            alert({error_message});
+        }
+    </script> -->
     <!-- Footer -->
     <footer class="footer mt-5">
         <div class="container">
